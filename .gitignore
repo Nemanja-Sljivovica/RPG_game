@@ -105,3 +105,17 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# PyCharm / IntelliJ
+.idea/
+
+# Python / Django
+server/.venv/
+server/venv/
+server/__pycache__/
+server/**/__pycache__/
+server/**/*.pyc
+server/db.sqlite3
+server/.env
+server/staticfiles/
+server/*.log
