@@ -11,35 +11,41 @@ LEVEL_UP_GAINS = {"health": 15, "attack": 3, "defense": 2, "magic": 3}
 XP_CURVE = [0, 100, 250, 500, 1000, 2000, 4000]
 
 MOVES = {
-    "slash":        {"name": "Slash",        "type": "physical", "effect": "damage", "power": 20, "input": "wwww"},
-    "shield_up":    {"name": "Shield Up",    "type": "physical", "effect": "buff_defense_self", "power": 5, "duration": 2, "input": "ssss"},
-    "battle_cry":   {"name": "Battle Cry",   "type": "physical", "effect": "buff_attack_self", "power": 5, "duration": 2, "input": "dddd"},
-    "second_wind":  {"name": "Second Wind",  "type": "magic",    "effect": "heal_self", "power": 25, "input": "aaaa"},
+    # Knight
+    "slash":        {"name": "Slash",        "type": "physical", "effect": "damage", "power": 20, "input": "wdwd"},
+    "shield_up":    {"name": "Shield Up",    "type": "physical", "effect": "buff_defense_self", "power": 5, "duration": 2, "input": "sasd"},
+    "battle_cry":   {"name": "Battle Cry",   "type": "physical", "effect": "buff_attack_self", "power": 5, "duration": 2, "input": "wwds"},
+    "second_wind":  {"name": "Second Wind",  "type": "magic",    "effect": "heal_self", "power": 25, "input": "asas"},
 
-    "shadow_bolt":  {"name": "Shadow Bolt",  "type": "magic",    "effect": "damage", "power": 30},
-    "drain_life":   {"name": "Drain Life",   "type": "magic",    "effect": "drain", "power": 12},
-    "curse":        {"name": "Curse",        "type": "magic",    "effect": "debuff_attack_target", "power": 4, "duration": 2},
-    "dark_pact":    {"name": "Dark Pact",    "type": "magic",    "effect": "buff_magic_self_costhp", "power": 6, "hp_cost": 10, "duration": 2},
+    # Witch
+    "shadow_bolt":  {"name": "Shadow Bolt",  "type": "magic",    "effect": "damage", "power": 30, "input": "awsa"},
+    "drain_life":   {"name": "Drain Life",   "type": "magic",    "effect": "drain", "power": 12, "input": "asaw"},
+    "curse":        {"name": "Curse",        "type": "magic",    "effect": "debuff_attack_target", "power": 4, "duration": 2, "input": "sasw"},
+    "dark_pact":    {"name": "Dark Pact",    "type": "magic",    "effect": "buff_magic_self_costhp", "power": 6, "hp_cost": 10, "duration": 2, "input": "awwa"},
 
-    "bite":         {"name": "Bite",         "type": "physical", "effect": "damage", "power": 18},
-    "web_throw":    {"name": "Web Throw",    "type": "physical", "effect": "damage_debuff_defense", "power": 8, "debuff": 4, "duration": 2},
-    "pounce":       {"name": "Pounce",       "type": "physical", "effect": "damage", "power": 28},
-    "skitter":      {"name": "Skitter",      "type": "physical", "effect": "buff_defense_self", "power": 5, "duration": 2},
+    # Giant Spider
+    "bite":         {"name": "Bite",         "type": "physical", "effect": "damage", "power": 18, "input": "wdwa"},
+    "web_throw":    {"name": "Web Throw",    "type": "physical", "effect": "damage_debuff_defense", "power": 8, "debuff": 4, "duration": 2, "input": "swda"},
+    "pounce":       {"name": "Pounce",       "type": "physical", "effect": "damage", "power": 28, "input": "dwds"},
+    "skitter":      {"name": "Skitter",      "type": "physical", "effect": "buff_defense_self", "power": 5, "duration": 2, "input": "sdsa"},
 
-    "flame_breath": {"name": "Flame Breath", "type": "magic",    "effect": "damage", "power": 32},
-    "claw_swipe":   {"name": "Claw Swipe",   "type": "physical", "effect": "damage", "power": 20},
-    "intimidate":   {"name": "Intimidate",   "type": "physical", "effect": "debuff_attack_target", "power": 5, "duration": 2},
-    "dragon_scales":{"name": "Dragon Scales","type": "physical", "effect": "buff_defense_self", "power": 6, "duration": 2},
+    # Dragon
+    "flame_breath": {"name": "Flame Breath", "type": "magic",    "effect": "damage", "power": 32, "input": "dwww"},
+    "claw_swipe":   {"name": "Claw Swipe",   "type": "physical", "effect": "damage", "power": 20, "input": "dwsd"},
+    "intimidate":   {"name": "Intimidate",   "type": "physical", "effect": "debuff_attack_target", "power": 5, "duration": 2, "input": "swws"},
+    "dragon_scales":{"name": "Dragon Scales","type": "physical", "effect": "buff_defense_self", "power": 6, "duration": 2, "input": "ssdw"},
 
-    "rusty_blade":  {"name": "Rusty Blade",  "type": "physical", "effect": "damage", "power": 18},
-    "dirty_kick":   {"name": "Dirty Kick",   "type": "physical", "effect": "damage_debuff_defense", "power": 8, "debuff": 4, "duration": 2},
-    "frenzy":       {"name": "Frenzy",       "type": "physical", "effect": "buff_attack_self", "power": 5, "duration": 2},
-    "headbutt":     {"name": "Headbutt",     "type": "physical", "effect": "damage", "power": 26},
+    # Goblin Warrior
+    "rusty_blade":  {"name": "Rusty Blade",  "type": "physical", "effect": "damage", "power": 18, "input": "dssd"},
+    "dirty_kick":   {"name": "Dirty Kick",   "type": "physical", "effect": "damage_debuff_defense", "power": 8, "debuff": 4, "duration": 2, "input": "sdds"},
+    "frenzy":       {"name": "Frenzy",       "type": "physical", "effect": "buff_attack_self", "power": 5, "duration": 2, "input": "wads"},
+    "headbutt":     {"name": "Headbutt",     "type": "physical", "effect": "damage", "power": 26, "input": "wsdw"},
 
-    "firebolt":     {"name": "Firebolt",     "type": "magic",    "effect": "damage", "power": 22},
-    "arcane_surge": {"name": "Arcane Surge", "type": "magic",    "effect": "buff_magic_self", "power": 5, "duration": 2},
-    "mana_drain":   {"name": "Mana Drain",   "type": "magic",    "effect": "damage_debuff_magic", "power": 8, "debuff": 4, "duration": 2},
-    "hex_shield":   {"name": "Hex Shield",   "type": "magic",    "effect": "buff_defense_self", "power": 5, "duration": 2},
+    # Goblin Mage
+    "firebolt":     {"name": "Firebolt",     "type": "magic",    "effect": "damage", "power": 22, "input": "adda"},
+    "arcane_surge": {"name": "Arcane Surge", "type": "magic",    "effect": "buff_magic_self", "power": 5, "duration": 2, "input": "wasw"},
+    "mana_drain":   {"name": "Mana Drain",   "type": "magic",    "effect": "damage_debuff_magic", "power": 8, "debuff": 4, "duration": 2, "input": "asdw"},
+    "hex_shield":   {"name": "Hex Shield",   "type": "magic",    "effect": "buff_defense_self", "power": 5, "duration": 2, "input": "sdwa"},
 }
 
 MONSTERS = [
