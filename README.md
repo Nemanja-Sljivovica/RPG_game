@@ -11,10 +11,12 @@ You need Python 3.10+ and Unity 6 (6000.4.5f1) with the URP 2D template support.
 ### 1. Start the server
 
 Open a terminal in the `server/` folder:
+```
 python -m venv .venv
 .venv\Scripts\activate
 pip install django djangorestframework django-cors-headers
 python manage.py runserver
+```
 
 The server starts on `http://localhost:8000`. Leave the terminal open during play.
 
@@ -45,6 +47,7 @@ Game data lives in `server/game/config.py`. Designers can change monster stats, 
 
 ## Project structure
 
+```
 RPG_game/
 ├── Assets/
 │   ├── Scenes/              MainMenu, Map, Battle, MoveManagement
@@ -60,6 +63,7 @@ RPG_game/
 │   ├── game/                App with config.py (game data), views.py, urls.py
 │   └── manage.py
 └── README.md
+```
 
 ## Design decisions
 
