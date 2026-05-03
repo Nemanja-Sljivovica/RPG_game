@@ -14,7 +14,7 @@ Open a terminal in the `server/` folder:
 ```
 python -m venv .venv
 .venv\Scripts\activate
-pip install django djangorestframework django-cors-headers
+pip install -r requirements.txt
 python manage.py runserver
 ```
 
