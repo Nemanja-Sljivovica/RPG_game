@@ -41,6 +41,9 @@ public class BattleController : MonoBehaviour
     private string typedSequence = "";
     private Dictionary<string, string> wasdToMoveId = new Dictionary<string, string>();
 
+    private Vector3 heroSpriteHome;
+    private Vector3 monsterSpriteHome;
+
     void Start()
     {
         if (GameState.Instance == null || GameState.Instance.Config == null)
@@ -57,10 +60,13 @@ public class BattleController : MonoBehaviour
         SetupCombatants();
         SetupSprites();
         BuildMoveButtons();
-        UpdateHpUI();
+        ForceSetHpUI();
         BattleLogText.text = $"A wild {monsterData.name} appears!";
         ResultPanel.SetActive(false);
         WasdDisplay.text = "";
+
+        heroSpriteHome = HeroSprite.transform.localPosition;
+        monsterSpriteHome = MonsterSprite.transform.localPosition;
 
         ResultButton.onClick.AddListener(OnResultButton);
     }
@@ -105,6 +111,10 @@ public class BattleController : MonoBehaviour
         }
         HeroSprite.preserveAspect = true;
         MonsterSprite.preserveAspect = true;
+        HeroSprite.color = Color.white;
+        MonsterSprite.color = Color.white;
+        HeroSprite.transform.localScale = Vector3.one;
+        MonsterSprite.transform.localScale = Vector3.one;
 
         var hData = GameState.Instance.Hero;
         HeroNameText.text = $"{hero.Name}  Lv {hData.level}";
@@ -127,6 +137,15 @@ public class BattleController : MonoBehaviour
             string typeTag = moveData.type == "magic" ? "<color=#a3c2ff>[M]</color>" : "<color=#ffb88a>[P]</color>";
             string inputTag = !string.IsNullOrEmpty(moveData.input) ? $"[{moveData.input.ToUpper()}]" : "";
             label.text = $"{inputTag}\n{typeTag} {moveData.name}";
+
+            // Tint button by move type
+            var btnImg = btn.GetComponent<Image>();
+            if (btnImg != null)
+            {
+                btnImg.color = moveData.type == "magic"
+                    ? new Color(0.78f, 0.85f, 1f, 1f)
+                    : new Color(1f, 0.88f, 0.78f, 1f);
+            }
 
             string capturedId = moveId;
             btn.onClick.AddListener(() => OnPlayerMove(capturedId));
@@ -197,29 +216,37 @@ public class BattleController : MonoBehaviour
     IEnumerator ResolvePlayerTurn(string moveId)
     {
         var move = moves[moveId];
+
+        // Hero lunge
+        yield return StartCoroutine(LungeAttack(HeroSprite.transform, heroSpriteHome, +120f));
+
         var result = MoveResolver.Apply(move, hero, monster);
         BattleLogText.text = result.Description;
+        if (result.DamageDealt > 0) StartCoroutine(FlashHit(MonsterSprite));
         UpdateHpUI();
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(0.8f);
 
         if (monster.IsDead) { EndBattle(true); yield break; }
 
         // Ask server for monster move
-        bool gotMove = false;
         string monsterMoveId = null;
         yield return StartCoroutine(ApiClient.Instance.GetMonsterMove(
             monsterData.id, monster.HpPct, hero.HpPct,
-            (id) => { monsterMoveId = id; gotMove = true; },
-            (err) => { BattleLogText.text = $"Server error: {err}"; gotMove = true; }
+            (id) => { monsterMoveId = id; },
+            (err) => { BattleLogText.text = $"Server error: {err}"; }
         ));
 
         if (!string.IsNullOrEmpty(monsterMoveId) && moves.ContainsKey(monsterMoveId))
         {
+            // Monster lunge (toward hero, so negative X)
+            yield return StartCoroutine(LungeAttack(MonsterSprite.transform, monsterSpriteHome, -120f));
+
             var monsterMove = moves[monsterMoveId];
             var monsterResult = MoveResolver.Apply(monsterMove, monster, hero);
             BattleLogText.text = monsterResult.Description;
+            if (monsterResult.DamageDealt > 0) StartCoroutine(FlashHit(HeroSprite));
             UpdateHpUI();
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(0.8f);
         }
 
         if (hero.IsDead) { EndBattle(false); yield break; }
@@ -230,28 +257,111 @@ public class BattleController : MonoBehaviour
         SetMoveButtonsInteractable(true);
     }
 
+    IEnumerator LungeAttack(Transform sprite, Vector3 home, float xOffset)
+    {
+        float forward = 0.15f;
+        float back = 0.2f;
+        Vector3 target = home + new Vector3(xOffset, 0, 0);
+
+        float elapsed = 0f;
+        while (elapsed < forward)
+        {
+            elapsed += Time.deltaTime;
+            sprite.localPosition = Vector3.Lerp(home, target, elapsed / forward);
+            yield return null;
+        }
+        sprite.localPosition = target;
+
+        elapsed = 0f;
+        while (elapsed < back)
+        {
+            elapsed += Time.deltaTime;
+            sprite.localPosition = Vector3.Lerp(target, home, elapsed / back);
+            yield return null;
+        }
+        sprite.localPosition = home;
+    }
+
+    IEnumerator FlashHit(Image sprite)
+    {
+        Color original = sprite.color;
+        sprite.color = new Color(1f, 0.4f, 0.4f, 1f);
+        yield return new WaitForSeconds(0.12f);
+        sprite.color = original;
+    }
+
     void SetMoveButtonsInteractable(bool on)
     {
         foreach (var b in moveButtons) b.interactable = on;
     }
 
-    void UpdateHpUI()
+    void ForceSetHpUI()
     {
         HeroHpBarFill.fillAmount = hero.HpPct;
-        HeroHpText.text = $"{hero.CurrentHp} / {hero.MaxHp}";
         MonsterHpBarFill.fillAmount = monster.HpPct;
+        HeroHpText.text = $"{hero.CurrentHp} / {hero.MaxHp}";
         MonsterHpText.text = $"{monster.CurrentHp} / {monster.MaxHp}";
+    }
+
+    void UpdateHpUI()
+    {
+        StartCoroutine(AnimateHpBar(HeroHpBarFill, HeroHpBarFill.fillAmount, hero.HpPct));
+        StartCoroutine(AnimateHpBar(MonsterHpBarFill, MonsterHpBarFill.fillAmount, monster.HpPct));
+        HeroHpText.text = $"{hero.CurrentHp} / {hero.MaxHp}";
+        MonsterHpText.text = $"{monster.CurrentHp} / {monster.MaxHp}";
+    }
+
+    IEnumerator AnimateHpBar(Image bar, float from, float to)
+    {
+        float duration = 0.4f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            bar.fillAmount = Mathf.Lerp(from, to, elapsed / duration);
+            yield return null;
+        }
+        bar.fillAmount = to;
     }
 
     void EndBattle(bool won)
     {
         battleOver = true;
         SetMoveButtonsInteractable(false);
+
+        if (won) StartCoroutine(FadeSpriteOut(MonsterSprite));
+        else StartCoroutine(FadeSpriteOut(HeroSprite));
+
+        StartCoroutine(ShowResultPanelAfter(1.0f, won));
+    }
+
+    IEnumerator FadeSpriteOut(Image sprite)
+    {
+        float duration = 0.8f;
+        float elapsed = 0f;
+        Color start = sprite.color;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            sprite.color = new Color(start.r, start.g, start.b, 1f - t);
+            sprite.transform.localScale = Vector3.one * (1f - t * 0.3f);
+            yield return null;
+        }
+        sprite.color = new Color(start.r, start.g, start.b, 0f);
+    }
+
+    IEnumerator ShowResultPanelAfter(float delay, bool won)
+    {
+        yield return new WaitForSeconds(delay);
         ResultPanel.SetActive(true);
+
+        bool isReplay = GameState.Instance.IsReplay;
 
         if (won)
         {
             int xp = monsterData.xp_reward;
+            if (isReplay) xp = Mathf.Max(10, xp / 2);
             int oldLevel = GameState.Instance.Hero.level;
             GameState.Instance.AwardXp(xp);
             int newLevel = GameState.Instance.Hero.level;
@@ -269,15 +379,18 @@ public class BattleController : MonoBehaviour
                 learnedLine = "\n(All moves already learned)";
             }
 
-            GameState.Instance.CurrentEncounterIndex++;
+            if (!isReplay) GameState.Instance.CurrentEncounterIndex++;
 
             string lvLine = newLevel > oldLevel ? $"\n<color=#ffd966>Level up! Now level {newLevel}</color>" : "";
-            ResultText.text = $"<color=#a8e6a3>Victory!</color>\n+{xp} XP{lvLine}{learnedLine}";
+            string replayTag = isReplay ? "<color=#cccccc>(Replay)</color>\n" : "";
+            ResultText.text = $"{replayTag}<color=#a8e6a3>Victory!</color>\n+{xp} XP{lvLine}{learnedLine}";
         }
         else
         {
             ResultText.text = "<color=#ff8080>Defeat...</color>\nReturning to map.";
         }
+
+        GameState.Instance.ReplayMonsterIndex = -1;
     }
 
     void OnResultButton()

@@ -97,7 +97,7 @@ public class MapController : MonoBehaviour
         // Encounter slot tinting
         for (int i = 0; i < encounterSlots.Count; i++)
         {
-            var img = encounterSlots[i].GetComponent<Image>();
+             var img = encounterSlots[i].GetComponent<Image>();
             if (i < idx) img.color = new Color(0.6f, 1f, 0.6f);          // beaten = light green
             else if (i == idx) img.color = new Color(1f, 0.95f, 0.6f);   // current = light yellow
             else img.color = new Color(0.7f, 0.7f, 0.7f);                // future = gray
@@ -111,14 +111,31 @@ public class MapController : MonoBehaviour
         else
         {
             var monster = state.GetCurrentMonster();
-            MapStatusText.text = $"Next encounter: {monster.name}";
+            MapStatusText.text = $"Next encounter: {monster.name}\n<size=20>(Click any beaten monster to replay for XP and try to learn another move)</size>";
             EnterBattleButton.interactable = state.EquippedMoves.Count > 0;
         }
     }
 
     void OnSlotClicked(int idx)
     {
-        if (idx == GameState.Instance.CurrentEncounterIndex) OnEnterBattle();
+        var state = GameState.Instance;
+        if (idx == state.CurrentEncounterIndex)
+        {
+             OnEnterBattle();
+        }
+        else if (idx < state.CurrentEncounterIndex)
+         {
+        // Replay an already-beaten fight (grind XP, try to learn another move)
+            StartCoroutine(EnterReplayBattle(idx));
+        }
+    // future encounters (idx > current) do nothing
+    }
+
+    System.Collections.IEnumerator EnterReplayBattle(int idx)
+    {
+        GameState.Instance.ReplayMonsterIndex = idx;
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Battle");
+        yield break;
     }
 
     void OnEnterBattle()

@@ -11,6 +11,7 @@ public class GameState : MonoBehaviour
     public List<string> EquippedMoves = new List<string>();
     public int CurrentEncounterIndex = 0;
     public int MaxEquipped = 4;
+    public int ReplayMonsterIndex = -1;  
 
     void Awake()
     {
@@ -30,9 +31,14 @@ public class GameState : MonoBehaviour
 
     public MonsterData GetCurrentMonster()
     {
-        if (Config == null || CurrentEncounterIndex >= Config.monsters.Count) return null;
+        if (Config == null) return null;
+        if (ReplayMonsterIndex >= 0 && ReplayMonsterIndex < Config.monsters.Count)
+            return Config.monsters[ReplayMonsterIndex];
+        if (CurrentEncounterIndex >= Config.monsters.Count) return null;
         return Config.monsters[CurrentEncounterIndex];
     }
+
+    public bool IsReplay => ReplayMonsterIndex >= 0;
 
     public bool IsRunComplete()
     {
