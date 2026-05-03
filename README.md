@@ -26,6 +26,14 @@ To verify it works, open `http://localhost:8000/api/run/config/` in a browser. Y
 
 Open the `RPG_game` folder in Unity Hub, then open `Assets/Scenes/MainMenu.unity` and press Play. Click "Start Run" to begin a run.
 
+### Alternative: pre-built Windows binary
+
+If you only want to evaluate the game without setting up Unity, a pre-built Windows binary is available here:
+
+https://drive.google.com/file/d/1rD97LYOdTsuADLh0ljsssll3ES4YUvtI/view?usp=sharing
+
+Extract the zip and run `RPG_game.exe`. The Django server (Step 1 above) must still be running for the game to communicate with it.
+
 ## Game flow
 
 The hero starts with 4 default moves (Slash, Shield Up, Battle Cry, Second Wind) and faces a fixed sequence of 5 monsters: Goblin Warrior → Giant Spider → Goblin Mage → Witch → Dragon. Combat is turn-based: pick a move (click a button or type its 4-character WASD sequence), the server picks the monster's response, both moves resolve, repeat until one side hits 0 HP.
